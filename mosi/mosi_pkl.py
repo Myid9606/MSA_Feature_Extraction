@@ -3,9 +3,12 @@ from glob import glob
 import os
 import numpy as np
 from pathlib import Path
+'''
+Finally, mosi_pkl. py is responsible for saving all individual sample features
+into nofeat. pkl 
+and merging them into a distinctive pkl file.
+'''
 
-# Afterwards, mosi_pkl. py is responsible for merging all individual sample features into 
-# one pkl file
 
 
 
