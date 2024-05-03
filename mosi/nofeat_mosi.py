@@ -1,5 +1,10 @@
 import csv
-
+'''
+Afterwards, use nofeat_mosi. py to save the existing information
+as a file to be supplemented, 
+which contains information such as ID and source text,
+but the feature bar has no content
+'''
 data = {}
 
 with open('/home/liuweilong/MMSA-FET/MOSI/regression_label.csv', 'r') as file:
@@ -37,9 +42,7 @@ with open('/home/liuweilong/MMSA-FET/MOSI/regression_label.csv', 'r') as file:
         data[mode]['regression_labels'].append(row['label'])
 import pickle
 
-# 假设保存路径为'/path/to/save/data.pkl'
-save_path = '/home/liuweilong/MMSA-FET/MOSI/Processed/nofeat_mosi.pkl'
+save_path = 'MOSI/Processed/nofeat_mosi.pkl'
 
-# 保存data字典为.pkl文件
 with open(save_path, 'wb') as f:
     pickle.dump(data, f)
