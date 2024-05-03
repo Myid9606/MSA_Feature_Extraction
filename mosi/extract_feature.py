@@ -1,3 +1,4 @@
+# First, extract a single feature file for each sample using extractfeature.py
 from MSA_FET import FeatureExtractionTool
 import shlex
 import subprocess
@@ -12,7 +13,7 @@ import pickle
 import numpy as np
 import time
 import csv
-
+#padding
 def audio_pad(raw_item,audio_len=400):
     if raw_item['audio'].shape[0] > audio_len:
         raw_item['audio_lengths'] = audio_len
@@ -41,7 +42,7 @@ def vision_pad(raw_item,vision_len = 200):
         raw_item['vision_lengths'] = raw_item['vision'].shape[0]
         raw_item['vision'] = np.pad(raw_item['vision'], ((0, vision_len - raw_item['vision'].shape[0]), (0, 0)), 'constant')
     return raw_item
-
+#device:   cuda or cpu
 DEVICE = "cuda"
 WAV2VEC_MODEL_NAME = "jonatasgrosman/wav2vec2-large-xlsr-53-english"
 
@@ -88,144 +89,13 @@ def get_asr_text(mode,audio_type):
             f.write(transcript)
         os.remove(audio_save_path)
 
-def get_video_feature(mode,video_type):
-    openface_fet = FeatureExtractionTool(config='/home/liuweilong/MMSA-FET/config.json')
-    # video_path = Path(dataset_dir) / 'Raw' / video_id / (str(clip_id) + '.mp4')
-    video_list = glob(f'{VIDEO_PATH}/video_{mode}_{video_type}/miss*/*mp4')
-    for item in tqdm(video_list):
-        parent =  Path(item).parent
-        name = Path(item).stem + '.pkl'
-        if os.path.exists(f"{parent}/{name}"):
-            continue
-        try:
-            openface_item = openface_fet.run_single(item)
-        except Exception as e:
-            openface_fet = FeatureExtractionTool(config='configs/openface.json')
-            openface_item = openface_fet.run_single(item)
-        pickle.dump(openface_item, open(f"{parent}/{name}",'wb'))
-
-def get_audio_feature(mode,audio_type):
-    opensmile_fet = FeatureExtractionTool(config='configs/opensmile.json')
-    bert_fet = FeatureExtractionTool(config="configs/bert.json")
-    video_list = glob(f'{VIDEO_PATH}/audio_{mode}_{audio_type}/miss*/*mp4')
-    for item in tqdm(video_list):
-        parent =  Path(item).parent
-        name = Path(item).stem
-        if os.path.exists(f"{parent}/{name}.pkl"):
-            continue
-        try:
-            opensmile_item = opensmile_fet.run_single(item)
-            bert_item = bert_fet.run_single(f"{parent}/{name}.txt")
-            opensmile_item.update(bert_item)
-        except Exception as e:
-            opensmile_fet = FeatureExtractionTool(config='configs/opensmile.json')
-            bert_fet = FeatureExtractionTool(config="configs/bert.json")
-            opensmile_item = opensmile_fet.run_single(item)
-            bert_item = bert_fet.run_single(f"{parent}/{name}.txt")
-            opensmile_item.update(bert_item)
-        pickle.dump(opensmile_item, open(f"{parent}/{name}.pkl",'wb'))
-
-def get_simsv2_feature(mode):
-    # feat_original_path = f"{DATA_PATH}/Processed/simsv2_unaligned.pkl"
-    # with open(feat_original_path, 'rb') as f:
-    #     feature = pickle.load(f)
-    # feature = feature[mode]
-    openface_fet = FeatureExtractionTool(config='configs/openface.json')
-    opensmile_fet = FeatureExtractionTool(config='configs/opensmile.json')
-    bert_fet = FeatureExtractionTool(config="configs/bert.json")
-    video_list = glob(f'/home/sharing/disk2/zhangbaozheng/dataset/simsv2/{mode}_raw/*mp4')
-    for item in tqdm(video_list):
-        parent =  Path(item).parent
-        name = Path(item).stem
-        if os.path.exists(f"{parent}/{name}.pkl"):
-            continue
-        try:
-            opensmile_item = opensmile_fet.run_single(item)
-            opensmile_item = audio_pad(opensmile_item)
-            openface_item = openface_fet.run_single(item)
-            openface_item = vision_pad(openface_item)
-            bert_item = bert_fet.run_single(f"{parent}/{name}.txt")
-            
-        except Exception as e:
-            openface_fet = FeatureExtractionTool(config='configs/openface.json')
-            opensmile_fet = FeatureExtractionTool(config='configs/opensmile.json')
-            bert_fet = FeatureExtractionTool(config="configs/bert.json")
-            opensmile_item = opensmile_fet.run_single(item)
-            opensmile_item = audio_pad(opensmile_item)
-            openface_item = openface_fet.run_single(item)
-            openface_item = vision_pad(openface_item)
-            bert_item = bert_fet.run_single(f"{parent}/{name}.txt")
-            opensmile_item.update(openface_item)
-        pickle.dump(opensmile_item, open(f"{parent}/{name}.pkl",'wb'))
-
-def get_mintrec_feature():
-    # feat_original_path = f"{DATA_PATH}/Processed/simsv2_unaligned.pkl"
-    # with open(feat_original_path, 'rb') as f:
-    #     feature = pickle.load(f)
-    # feature = feature[mode]
-    openface_fet = FeatureExtractionTool(config='configs/openface.json')
-    opensmile_fet = FeatureExtractionTool(config='configs/opensmile.json')
-    # bert_fet = FeatureExtractionTool(config="configs/bert.json")
-    video_list = glob(f'/home/sharing/disk1/Datasets/SIMS3/SIMS3/video_clip_s/video*/*mp4')
-    
-    for item in tqdm(video_list):
-        parent =  Path(item).parent
-        name = Path(item).stem
-        if os.path.exists(f"{parent}/{name}.pkl"):
-            continue
-        try:
-            opensmile_item = opensmile_fet.run_single(item)
-            opensmile_item = audio_pad(opensmile_item)
-            openface_item = openface_fet.run_single(item)
-            openface_item = vision_pad(openface_item)
-            opensmile_item.update(openface_item)
-            # bert_item = bert_fet.run_single(f"{parent}/{name}.txt")
-            # bert_item = text_pad(bert_item)
-            # opensmile_item.update(bert_item)
-            pickle.dump(opensmile_item, open(f"{parent}/{name}.pkl",'wb'))
-            time.sleep(0.5)
-            
-        except Exception as e:
-            openface_fet = FeatureExtractionTool(config='configs/openface.json')
-            opensmile_fet = FeatureExtractionTool(config='configs/opensmile.json')
-            # bert_item = bert_fet.run_single(f"{parent}/{name}.txt")
-            # bert_item = text_pad(bert_item)
-            # opensmile_item.update(bert_item)
-            time.sleep(1)
-
-def simsv3_bert():
-    with open('/home/sharing/disk1/Datasets/SIMS3/SIMS3/features/text_bert.pkl', 'rb') as f:
-        bert_data = pickle.load(f)
-    feat_original_path = f"/home/sharing/disk1/zhangbaozheng/code/interpretability_work/datasets/process/zbz_labels.pkl"
-    with open(feat_original_path, 'rb') as f:
-        feature = pickle.load(f)
-    bert_fet = FeatureExtractionTool(config="configs/ch_bert.json")
-    new_dict = bert_data
-    for item in zip(feature['clip_id'],feature['text']):
-        try:
-            if item[0] in bert_data['id']:
-                continue
-            bert_item = bert_fet.run_single(in_file='', text=item[1])
-            bert_item = text_pad(bert_item)
-            new_dict['id'].append(item[0])
-            new_dict['text_raw'].append(item[1])
-            new_dict['text_bert'].append(bert_item['text_bert'])
-            new_dict['text_lengths'].append(bert_item['text_lengths'])
-        except:
-            continue
-    pickle.dump(new_dict, open(f"/home/sharing/disk1/Datasets/SIMS3/SIMS3/features/text_bert_1.pkl",'wb'))
-
 def get_mosi_feature():
-    # feat_original_path = f"{DATA_PATH}/Processed/simsv2_unaligned.pkl"
-    # with open(feat_original_path, 'rb') as f:
-    #     feature = pickle.load(f)
-    # feature = feature[mode]
+    # configs files
     openface_fet = FeatureExtractionTool(config='configs/openface.json')
     opensmile_fet = FeatureExtractionTool(config='configs/opensmile.json')
     bert_fet = FeatureExtractionTool(config="configs/bert.json")
-    # video_path = Path(dataset_dir) / 'Raw' / video_id / (str(clip_id) + '.mp4')
-    video_list = glob((f'/home/liuweilong/MMSA-FET/MOSI/Raw/**/*.mp4'), recursive=True)
-    # video_list = glob(f'/home/sharing/disk2/zhangbaozheng/dataset/simsv2/{mode}_raw/*mp4')
+
+    video_list = glob((f'MOSI/Raw/**/*.mp4'), recursive=True) #Dataset source file path
     for item in tqdm(video_list):
             parent =  Path(item).parent
             name = Path(item).stem
@@ -239,7 +109,7 @@ def get_mosi_feature():
             
             videoid = parent.name
             clipid = name
-                # 遍历每一行数据
+                        # CSV file corresponding to the dataset
             with open('/home/liuweilong/MMSA-FET/MOSI/regression_label.csv', 'r') as file:
                 reader = csv.DictReader(file)
                 for row in reader:
@@ -251,33 +121,15 @@ def get_mosi_feature():
             bert_item = text_pad(bert_item)
             opensmile_item.update(openface_item)
             opensmile_item.update(bert_item)
-            # csv mode  单个的pk
-            # l
                 
-            if not os.path.exists(f"/home/liuweilong/MMSA-FET/MOSI/{mode}_Raw/{videoid}"):
-                os.makedirs(f"/home/liuweilong/MMSA-FET/MOSI/{mode}_Raw/{videoid}")
-            pickle.dump(opensmile_item, open(f"/home/liuweilong/MMSA-FET/MOSI/{mode}_Raw/{videoid}/{name}.pkl",'wb'))  
+            if not os.path.exists(f"MOSI/{mode}_Raw/{videoid}"):
+                os.makedirs(f"MOSI/{mode}_Raw/{videoid}")
+            pickle.dump(opensmile_item, open(f"MOSI/{mode}_Raw/{videoid}/{name}.pkl",'wb'))  
 
 
 
 if __name__ == "__main__":
-    DATA_PATH = '/home/liuweilong/MMSA-FET/MOSI'
-    VIDEO_PATH = '/home/liuweilong/MMSA-FET/MOSI'
+    DATA_PATH = '/home'
+    VIDEO_PATH = '/home'
     get_mosi_feature()
-    # audio_type = 'color_w'
-    # get_asr_text(mode,audio_type)
-    # audio_type = 'bg_park'
-    # get_asr_text(mode,audio_type)
-    
-    # video_type = 'gblur'
-    # get_video_feature(mode,video_type)
-
-    # video_type = 'impulse_value'
-    # get_video_feature(mode,video_type)
-
-    # audio_type = 'color_w'
-    # get_audio_feature(mode,audio_type)
-
-    # audio_type = 'bg_park'
-    # get_audio_feature(mode,audio_type)
 
