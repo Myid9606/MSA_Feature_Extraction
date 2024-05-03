@@ -1,6 +1,6 @@
-# MSA_feature_Extraction
+# MSA Feature Extraction
 MSA_feature_Extraction based on https://github.com/thuiar/MMSA-FET/tree/master/src/MSA_FET
-## preparation
+## Preparation
 Firstly, we should https://github.com/thuiar/MMSA-FET/tree/master/src/MSA_FET Install extraction package,and then use our files to start extracting.
 ## Extracting
 The configs folder are configured methods for extracting information.
