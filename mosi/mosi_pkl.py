@@ -4,6 +4,9 @@ import os
 import numpy as np
 from pathlib import Path
 
+# Afterwards, mosi_pkl. py is responsible for merging all individual sample features into 
+# one pkl file
+
 
 
 def init_list():
@@ -54,7 +57,8 @@ def mosipkl(data):
             new_list['regression_labels'].append(item[3])
 
             with open(f'{SAVE_PATH}/{mode}_Raw/{parent}/{subid}.pkl', 'rb') as f:
-                raw_item = pickle.load(f)#pickle.load()赋值给raw_item变量
+                raw_item = pickle.load(f)
+                #pickle.load()赋值给raw_item变量
                 
             # 将raw_item字典中的一些字段值添加到new_list字典中对应的列表中d
             new_list['text'].append(raw_item['text'])
@@ -72,25 +76,18 @@ def mosipkl(data):
             new_list[key] = np.array(value)
         content[mode] = new_list
 
-    pickle.dump(content, open(f"{DATA_PATH}/Processed/unaligned_mosi_v200.pkl",'wb'))
+    pickle.dump(content, open(f"{DATA_PATH}/Processed/unaligned_mosi.pkl",'wb'))
 
 
 
 
 
 if __name__ == "__main__":
-    DATA_PATH = '/home/liuweilong/MMSA-FET/MOSI'
-    SAVE_PATH = '/home/liuweilong/MMSA-FET/MOSI'
+    DATA_PATH = '/home'
+    SAVE_PATH = '/home'
     with open(f"{DATA_PATH}/Processed/nofeat_mosi.pkl", 'rb') as f:
         data = pickle.load(f)
     mosipkl(data)
 
-    # data_type = 'impulse_value'
-    # # gblur impulse_value
-    # video_feature(mode, data_type)
-
-    # data_type = 'bg_park'/home/liuweilong/MMSA-FET/MOSI/Processed/nofeat_mosi.pkl
-    # color_w bg_park
-    # audio_feature(mode, data_type)
 
 
