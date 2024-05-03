@@ -1,0 +1,36 @@
+{
+  "audio": {
+    "tool": "opensmile",
+    "sample_rate": 16000,
+    "args": {
+      "feature_set": "eGeMAPSv02",
+      "feature_level": "Functionals",
+      "start": null,
+      "end": null
+    }
+  },
+  "video": {
+    "tool": "openface",
+    "fps": 25,
+    "average_over": 3,
+    "args": {
+      "hogalign": false,
+      "simalign": false,
+      "nobadaligned": false,
+      "landmark_2D": true,
+      "landmark_3D": false,
+      "pdmparams": false,
+      "head_pose": true,
+      "action_units": true,
+      "gaze": true,
+      "tracked": false
+    }
+  },
+    "text": {
+    "model": "bert",
+    "device": "cuda:0",
+    "pretrained": "/home/liuweilong/CMSA/pretrained_model/bert_en",
+    "args": {}
+  }
+ 
+}

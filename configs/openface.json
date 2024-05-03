@@ -1,0 +1,21 @@
+{
+   
+  "video": {
+    "tool": "openface",
+    "fps": 25,
+    "average_over": 3,
+    "args": {
+      "hogalign": false,
+      "simalign": false,
+      "nobadaligned": false,
+      "landmark_2D": true,
+      "landmark_3D": false,
+      "pdmparams": false,
+      "head_pose": true,
+      "action_units": true,
+      "gaze": true,
+      "tracked": false
+    }
+  }
+   
+  }

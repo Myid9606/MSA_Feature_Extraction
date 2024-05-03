@@ -1,0 +1,12 @@
+{
+   
+      "text": 
+      {
+      "model": "bert",
+      "device": "cuda:0",
+      "pretrained": "/home/liuweilong/MMSA-FET/pretrained_model/bert_en",
+      "args": {}
+    }
+   
+  }
+ 
